@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">OSK</string>
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Hasło</string>
+    <string name="prompt_email"> Email</string>
+    <string name="prompt_password"> Hasło</string>
     <string name="action_sign_in">ZALOGUJ</string>
     <string name="action_sign_in_short">ZALOGUJ</string>
     <string name="welcome">"Witaj !"</string>
