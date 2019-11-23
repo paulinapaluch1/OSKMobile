@@ -30,7 +30,6 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login(String username, String password) {
-        // can be launched in a separate asynchronous job
         Result<LoggedInUser> result = loginRepository.login(username, password);
 
         if (result instanceof Result.Success) {
@@ -40,7 +39,6 @@ public class LoginViewModel extends ViewModel {
             loginResult.setValue(new LoginResult(R.string.login_failed));
         }
     }
-
     public void loginDataChanged(String username, String password) {
         if (!isUserNameValid(username)) {
             loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
@@ -50,21 +48,13 @@ public class LoginViewModel extends ViewModel {
             loginFormState.setValue(new LoginFormState(true));
         }
     }
-
-    // A placeholder username validation check
     private boolean isUserNameValid(String username) {
         if (username == null) {
             return false;
-        }
-        if (username.contains("@")) {
-            return Patterns.EMAIL_ADDRESS.matcher(username).matches();
-        } else {
-            return !username.trim().isEmpty();
-        }
-    }
+        }return !username.trim().isEmpty();
 
-    // A placeholder password validation check
+    }
     private boolean isPasswordValid(String password) {
-        return password != null && password.trim().length() > 5;
+        return password != null;
     }
 }

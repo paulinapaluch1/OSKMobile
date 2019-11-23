@@ -6,13 +6,14 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,12 +29,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.osk.R;
-import com.example.osk.ui.login.LoginViewModel;
-import com.example.osk.ui.login.LoginViewModelFactory;
+import com.example.osk.model.User;
+import com.example.osk.remote.ApiUtils;
+import com.example.osk.remote.UserService;
 
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
+    private UserService userService ;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,11 +49,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
-//<div>Icons made by <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons">Those Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
-        //        android:layout_marginTop="340dp"
 
-
-        //<div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+        userService = ApiUtils.getUserService();
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
@@ -129,8 +129,48 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                loginViewModel.login(usernameEditText.getText().toString(),
+             //   loginViewModel.login(usernameEditText.getText().toString(),
+                   //     passwordEditText.getText().toString());
+
+                Call<User> call = userService.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
+
+                call.enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(Call<User> call, Response<User> response) {
+                        if (response.isSuccessful()) {
+                            User resObj=response.body();
+                            if(resObj.getMessage().equals("true")){
+
+
+                                finish();
+                                Intent intent = new Intent(LoginActivity.this, GetLocation.class);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(LoginActivity.this,"Login lub hasło jest niepoprawne",Toast.LENGTH_SHORT).show();
+                            }}else{
+                            Toast.makeText(LoginActivity.this,"Wystąpił błąd. Spróbuj ponownie",Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<User> call, Throwable t) {
+                        Toast.makeText(LoginActivity.this,t.getMessage(),Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
+
+
+
+
+
+
+
+
+
+
             }
         });
     }
