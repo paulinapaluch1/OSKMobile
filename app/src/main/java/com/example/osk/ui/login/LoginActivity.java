@@ -29,7 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.osk.R;
-import com.example.osk.model.User;
+import com.example.osk.model.Instructor;
 import com.example.osk.remote.ApiUtils;
 import com.example.osk.remote.UserService;
 
@@ -87,10 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 setResult(Activity.RESULT_OK);
 
-                //Complete and destroy login activity once successful
-                finish();
-                Intent intent = new Intent(LoginActivity.this, GetLocation.class);
-                startActivity(intent);
+
             }
         });
 
@@ -132,19 +129,19 @@ public class LoginActivity extends AppCompatActivity {
              //   loginViewModel.login(usernameEditText.getText().toString(),
                    //     passwordEditText.getText().toString());
 
-                Call<User> call = userService.login(usernameEditText.getText().toString(),
+                Call<Instructor> call = userService.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
 
-                call.enqueue(new Callback<User>() {
+                call.enqueue(new Callback<Instructor>() {
                     @Override
-                    public void onResponse(Call<User> call, Response<User> response) {
+                    public void onResponse(Call<Instructor> call, Response<Instructor> response) {
                         if (response.isSuccessful()) {
-                            User resObj=response.body();
+                            Instructor resObj=response.body();
                             if(resObj.getMessage().equals("true")){
-
-
                                 finish();
                                 Intent intent = new Intent(LoginActivity.this, GetLocation.class);
+                            // Bundle dane = new Bundle();
+                            intent.putExtra("instructor", resObj.getName()+" "+resObj.getSurname());
                                 startActivity(intent);
                             } else {
                                 Toast.makeText(LoginActivity.this,"Login lub hasło jest niepoprawne",Toast.LENGTH_SHORT).show();
@@ -155,7 +152,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<User> call, Throwable t) {
+                    public void onFailure(Call<Instructor> call, Throwable t) {
                         Toast.makeText(LoginActivity.this,t.getMessage(),Toast.LENGTH_SHORT).show();
 
                     }
