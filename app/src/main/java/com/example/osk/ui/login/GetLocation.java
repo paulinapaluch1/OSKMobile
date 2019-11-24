@@ -76,7 +76,7 @@ public class GetLocation extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if(extras!=null){
-            instructor.setText(instructor.getText()+ " "+instructorNameAndSurname);
+            instructor.setText(instructor.getText()+ " "+ extras.get("instructor"));
         }
     }
 
