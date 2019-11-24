@@ -16,13 +16,12 @@
 
     <EditText
         android:id="@+id/instructor"
-        android:layout_width="275dp"
+        android:layout_width="226dp"
         android:layout_height="wrap_content"
-        android:layout_bottom="@+id/buttonStart"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Instruktor:"
-        android:textColor="#ffff"
+        android:text=""
+        android:textColor="#ffffff"
         tools:layout_editor_absoluteX="-4dp"
         tools:layout_editor_absoluteY="-7dp"
 
@@ -30,10 +29,12 @@
 
     <Button
         android:id="@+id/logout"
-        android:layout_width="wrap_content"
+        android:layout_width="104dp"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/buttonStop"
         android:text="WYLOGUJ"
+        android:background="@drawable/button_grey"
+        android:layout_marginBottom="5dp"
+        android:textColor="#ffffff"
 
 
         />
@@ -44,21 +45,30 @@
 
     <Button
         android:id="@+id/buttonStart"
-        android:layout_width="187dp"
+        android:layout_width="163dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/button_success"
         android:text="START"
+
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
 
 
         />
 
     <Button
         android:id="@+id/buttonStop"
-        android:layout_width="180dp"
+        android:layout_width="161dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="-5dp"
+        android:background="@drawable/button_red"
         android:text="STOP"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
 
 
         />
@@ -68,21 +78,16 @@
         android:layout_height="wrap_content" >
 
         <ScrollView
-            android:layout_width="match_parent"
+            android:layout_width="331dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/buttonStop"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="15dp"
-            android:layout_marinEnd="15dp"
             android:background="#E4D9D9">
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/buttonStop"
-                android:layout_alignTop="@id/logout"
                 android:layout_alignParentStart="false"
                 android:layout_alignParentLeft="false"
                 android:layout_centerVertical="true"
@@ -97,14 +102,16 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="bottom"
+        android:gravity="bottom">
 
-
-        >
         <Button
             android:id="@+id/send"
-            android:layout_width="wrap_content"
+            android:layout_width="131dp"
             android:layout_height="wrap_content"
-            android:text="PRZEŚLIJ DANE" />
+            android:background="@drawable/button_success"
+            android:text="PRZEŚLIJ DANE"
+            android:textColor="@android:color/white"
+
+            />
     </LinearLayout>
 </LinearLayout>
