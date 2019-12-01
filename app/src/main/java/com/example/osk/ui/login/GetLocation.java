@@ -48,6 +48,7 @@ public class GetLocation extends AppCompatActivity {
     private EditText instructor;
     private DBManager dbManager;
     private UserService userService;
+    private Integer currentLoggedInstructorId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,7 +76,6 @@ public class GetLocation extends AppCompatActivity {
                 Date date = new Date();
                 dbManager.insert(String.valueOf(location.getLongitude()),
                         String.valueOf(location.getLatitude()), date.toString(), 0);
-
             }
 
             @Override
@@ -99,6 +99,7 @@ public class GetLocation extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             instructor.setText(instructor.getText() + " " + extras.get("instructor"));
+            currentLoggedInstructorId = (Integer)extras.get("id");
         }
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
@@ -126,30 +127,24 @@ public class GetLocation extends AppCompatActivity {
             public void onClick(View v) {
                 ArrayList pointsToSend = getGpsPointsToSend();
 
-                Call<Message> call = userService.sendCoordinates(pointsToSend);
+                Call<Message> call = userService.sendCoordinates(pointsToSend,1);//currentLoggedInstructorId);
                 call.enqueue(new Callback<Message>() {
                     @Override
                     public void onResponse(Call<Message> call, Response<Message> response) {
                         if (response.isSuccessful()) {
                             Message resObj = response.body();
                             if(resObj.getMessage().equals("true")){
-
-                                Toast.makeText(getApplicationContext(), "Przeslane", Toast.LENGTH_LONG).show();
-
+                                Toast.makeText(getApplicationContext(), "Przesłano dane ", Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(GetLocation.this,"Nie zapisano",Toast.LENGTH_SHORT).show();
                             }}else{
                             Toast.makeText(GetLocation.this,"Wystąpił błąd. Spróbuj ponownie",Toast.LENGTH_SHORT).show();
-
                         }
                     }
-
-
 
                     @Override
                     public void onFailure(Call<Message> call, Throwable t) {
                         Toast.makeText(GetLocation.this,t.getMessage(),Toast.LENGTH_SHORT).show();
-
                     }
                 });
             }
