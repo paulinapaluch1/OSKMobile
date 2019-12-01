@@ -18,7 +18,8 @@ public interface UserService {
     Call<Instructor> login(@Path("username") String username,
               @Path("password") String password);
 
-   @HTTP(method = "POST", path="send", hasBody = true)
-   Call<Message> sendCoordinates(@Body ArrayList<LocationToSend> coordinates);
+   @HTTP(method = "POST", path="send/{instructor}", hasBody = true)
+   Call<Message> sendCoordinates(@Body ArrayList<LocationToSend> coordinates,
+                                 @Path("instructor")Integer currentLoggedInstructorId);
 
 }

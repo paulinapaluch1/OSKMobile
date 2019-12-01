@@ -121,8 +121,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-             //   loginViewModel.login(usernameEditText.getText().toString(),
-                   //     passwordEditText.getText().toString());
 
                 Call<Instructor> call = userService.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
@@ -136,6 +134,7 @@ public class LoginActivity extends AppCompatActivity {
                                 finish();
                                 Intent intent = new Intent(LoginActivity.this, GetLocation.class);
                                 intent.putExtra("instructor", resObj.getName()+" "+resObj.getSurname());
+                                intent.putExtra("id", resObj.getId());
                                 String welcome = getString(R.string.welcome) +resObj.getName()+"!";
                                 Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
                                 startActivity(intent);
