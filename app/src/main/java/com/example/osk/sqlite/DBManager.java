@@ -65,4 +65,7 @@ public class DBManager {
     }
 
 
+    public SQLiteDatabase getReadableDatabase() {
+        return dbHelper.getReadableDatabase();
+    }
 }

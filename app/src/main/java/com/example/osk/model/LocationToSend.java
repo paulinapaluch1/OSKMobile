@@ -1,15 +1,15 @@
 package com.example.osk.model;
 
-import java.time.LocalDateTime;
-
-public class Location {
+public class LocationToSend {
 
     private String nw;
     private String ns;
-    private LocalDateTime time;
-    private boolean sent;
+    private String time;
+    private Integer sent;
 
-    public Location(String GPS_NW, String GPS_NS, LocalDateTime time) {
+    public LocationToSend(){}
+
+    public LocationToSend(String GPS_NW, String GPS_NS, String time) {
         this.nw = GPS_NW;
         this.ns = GPS_NS;
         this.time = time;
@@ -31,20 +31,20 @@ public class Location {
         this.ns = ns;
     }
 
-    public LocalDateTime getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
 
-    public boolean isSent() {
+    public Integer isSent() {
         return sent;
     }
 
-    public void setSent(boolean sent) {
+    public void setSent(Integer sent) {
         this.sent = sent;
     }
 }
