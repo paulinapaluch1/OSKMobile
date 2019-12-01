@@ -1,20 +1,8 @@
 package com.example.osk.ui.login;
 
 import android.app.Activity;
-
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -33,6 +21,15 @@ import com.example.osk.model.Instructor;
 import com.example.osk.remote.ApiUtils;
 import com.example.osk.remote.UserService;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
@@ -40,10 +37,10 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
-        getSupportActionBar().hide(); // hide the title bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         GetLocation location = new GetLocation();
         setContentView(R.layout.activity_login);
@@ -96,12 +93,10 @@ public class LoginActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // ignore
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // ignore
             }
-
             @Override
             public void afterTextChanged(Editable s) {
                 loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
@@ -136,13 +131,16 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<Instructor> call, Response<Instructor> response) {
                         if (response.isSuccessful()) {
-                            Instructor resObj=response.body();
+                            Instructor resObj = response.body();
                             if(resObj.getMessage().equals("true")){
                                 finish();
                                 Intent intent = new Intent(LoginActivity.this, GetLocation.class);
-                            // Bundle dane = new Bundle();
-                            intent.putExtra("instructor", resObj.getName()+" "+resObj.getSurname());
+                                intent.putExtra("instructor", resObj.getName()+" "+resObj.getSurname());
+                                String welcome = getString(R.string.welcome) +resObj.getName()+"!";
+                                Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
                                 startActivity(intent);
+                                finish();
+
                             } else {
                                 Toast.makeText(LoginActivity.this,"Login lub hasło jest niepoprawne",Toast.LENGTH_SHORT).show();
                             }}else{
@@ -158,23 +156,13 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
 
-
-
-
-
-
-
-
-
-
-
             }
         });
+
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
     }
 
