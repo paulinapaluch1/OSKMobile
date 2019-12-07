@@ -16,16 +16,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.osk.R;
-import com.example.osk.model.Instructor;
-import com.example.osk.remote.ApiUtils;
-import com.example.osk.remote.UserService;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
+import com.example.osk.R;
+import com.example.osk.model.Instructor;
+import com.example.osk.remote.ApiUtils;
+import com.example.osk.remote.UserService;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,7 +39,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
@@ -150,14 +150,13 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<Instructor> call, Throwable t) {
-                        Toast.makeText(LoginActivity.this,t.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this,t.getMessage(),Toast.LENGTH_LONG).show();
 
                     }
                 });
 
             }
         });
-
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
