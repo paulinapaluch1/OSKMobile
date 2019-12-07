@@ -10,38 +10,43 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
+import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.osk.R;
 import com.example.osk.model.LocationToSend;
-import com.example.osk.model.Message;
 import com.example.osk.remote.ApiUtils;
 import com.example.osk.remote.UserService;
 import com.example.osk.sqlite.DBManager;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+public class GetLocation extends FragmentActivity implements OnMapReadyCallback {
 
-public class GetLocation extends AppCompatActivity {
-
-    private Button buttonStart;
-    private Button buttonStop;
-    private Button buttonSendData;
+    //private Button buttonStop;
+    // private Button buttonSendData;
+    Location locationn;
     private TextView t;
     private LocationManager locationManager;
     private LocationListener listener;
@@ -50,24 +55,28 @@ public class GetLocation extends AppCompatActivity {
     private UserService userService;
     private Integer currentLoggedInstructorId;
 
+    FusedLocationProviderClient fusedLocationProviderClient;
+    private static final int Request_Code = 101;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start_stop);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         t = (TextView) findViewById(R.id.textView);
-        buttonStart = (Button) findViewById(R.id.buttonStart);
-        buttonStop = (Button) findViewById(R.id.buttonStop);
-        buttonSendData = findViewById(R.id.send);
-        instructor = (EditText) findViewById(R.id.instructor);
+        //final Button buttonStart = (Button) findViewById(R.id.buttonStart);
+        //buttonStop = (Button) findViewById(R.id.buttonStop);
+        //  final Button buttonSendData = findViewById(R.id.send);
+        // instructor = (EditText) findViewById(R.id.instructor);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        final Button logoutButton = findViewById(R.id.logout);
+        //final Button logoutButton = findViewById(R.id.logout);
         dbManager = new DBManager(this);
         dbManager.open();
         userService = ApiUtils.getUserService();
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+       // getLastLocation();
+
 
         listener = new LocationListener() {
             @Override
@@ -76,6 +85,7 @@ public class GetLocation extends AppCompatActivity {
                 Date date = new Date();
                 dbManager.insert(String.valueOf(location.getLongitude()),
                         String.valueOf(location.getLatitude()), date.toString(), 0);
+
             }
 
             @Override
@@ -98,17 +108,17 @@ public class GetLocation extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            instructor.setText(instructor.getText() + " " + extras.get("instructor"));
-            currentLoggedInstructorId = (Integer)extras.get("id");
+            // instructor.setText(instructor.getText() + " " + extras.get("instructor"));
+            currentLoggedInstructorId = (Integer) extras.get("id");
         }
-
-        logoutButton.setOnClickListener(new View.OnClickListener() {
+/*
+        buttonStart.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 Cursor c = dbManager.getDatabase().rawQuery("select * from gpspoints ", null);
                 if (c.getCount() == 0) {
                     Toast.makeText(getApplicationContext(), "Brak danych", Toast.LENGTH_LONG).show();
-                    return;
+                    return true;
                 }
                 StringBuilder buffer = new StringBuilder();
                 while (c.moveToNext()) {
@@ -118,38 +128,96 @@ public class GetLocation extends AppCompatActivity {
                     buffer.append("time: " + c.getString(3) + " \n");
                     buffer.append("sent: " + c.getString(4) + " \n");
                 }
-                Toast.makeText(getApplicationContext(),buffer.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
+                return true;
             }
         });
-
-        buttonSendData.setOnClickListener(new View.OnClickListener() {
+*/
+      /*  buttonSendData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ArrayList pointsToSend = getGpsPointsToSend();
 
-                Call<Message> call = userService.sendCoordinates(pointsToSend,1);//currentLoggedInstructorId);
+                Call<Message> call = userService.sendCoordinates(pointsToSend, 1);//currentLoggedInstructorId);
                 call.enqueue(new Callback<Message>() {
                     @Override
                     public void onResponse(Call<Message> call, Response<Message> response) {
                         if (response.isSuccessful()) {
                             Message resObj = response.body();
-                            if(resObj.getMessage().equals("true")){
+                            if (resObj.getMessage().equals("true")) {
                                 Toast.makeText(getApplicationContext(), "Przesłano dane ", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(GetLocation.this,"Nie zapisano",Toast.LENGTH_SHORT).show();
-                            }}else{
-                            Toast.makeText(GetLocation.this,"Wystąpił błąd. Spróbuj ponownie",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(GetLocation.this, "Nie zapisano", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(GetLocation.this, "Wystąpił błąd. Spróbuj ponownie", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Message> call, Throwable t) {
-                        Toast.makeText(GetLocation.this,t.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GetLocation.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
-        });
+        }); */
+        setContentView(R.layout.activity_start_stop);
+
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(fragmentManager);
+        // LocationFragment fragment = (LocationFragment) getSupportFragmentManager().findFragmentById(R.id.location);
+
+        adapter.addFrag(new Test(), "Mapa");
+        adapter.addFrag(new Test(), "Grafik");
+        adapter.addFrag(new LocationFragment(), "Profil");
+
+        viewPager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+
+        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabOne.setText("Lokalizacja");
+        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.location, 0, 0);
+        tabLayout.getTabAt(0).setCustomView(tabOne);
+
+        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabTwo.setText("Grafik");
+        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.calendar, 0, 0);
+        tabLayout.getTabAt(1).setCustomView(tabTwo);
+
+        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabThree.setText("Profil");
+        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.profile, 0, 0);
+        tabLayout.getTabAt(2).setCustomView(tabThree);
+
     }
+
+    private void getLastLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
+                        , 10);
+            }
+            return;
+        }
+
+        Task<Location> task = fusedLocationProviderClient.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    locationn = location;
+                  final  SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
+                    supportMapFragment.getMapAsync(GetLocation.this);
+
+
+
+                }
+            }
+        });
+
+
+    }
+
 
     private ArrayList getGpsPointsToSend() {
         String selectQuery = " select * from gpspoints where sent = 0";
@@ -172,40 +240,39 @@ public class GetLocation extends AppCompatActivity {
     }
 
     @Override
-        public void onRequestPermissionsResult( int requestCode, @NonNull String[] permissions,
-        @NonNull int[] grantResults){
-            switch (requestCode) {
-                case 10:
-                    configure_button();
-                    break;
-                default:
-                    break;
-            }
-        }
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng latLng = new LatLng(locationn.getLatitude(), locationn.getLongitude());
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("here");
+        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
+        googleMap.addMarker(markerOptions);
 
-        void configure_button () {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
-                            , 10);
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 10:
+                configure_button();
+                break;
+            case Request_Code:
+                if(grantResults.length>0 && grantResults[0] ==PackageManager.PERMISSION_GRANTED){
+                    getLastLocation();
                 }
-                return;
-            }
-            buttonStart.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View view) {
-                    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED
-                            && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    locationManager
-                            .requestLocationUpdates("gps", 5000,
-                                    0, listener);
-                }
-            });
+                break;
+            default:
+                break;
         }
     }
+
+    private void configure_button() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
+                        , 10);
+            }
+            return;
+        }
+    }
+}
 

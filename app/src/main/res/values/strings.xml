@@ -11,14 +11,7 @@
     <string name="login_failed">"Logowanie nie powiodło się"</string>
 
 
-
-
-
-
-
-
-
-    <string name="permission_rationale">Location permission is needed for core functionality</string>
+    <string name="permission_rationale">Aplikacja potrzebuje zgody na dostęp do lokalizacji</string>
     <string name="permission_denied_explanation">Permission was denied, but is needed for core
         functionality.</string>
     <string name="settings">Settings</string>
@@ -37,11 +30,12 @@
     </plurals>
 
     <string name="default_channel">Default channel</string>
-
-
-
-
-
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home">Zapis lokalizacji</string>
+    <string name="title_dashboard">Jazdy na dziś</string>
+    <string name="title_notifications">Twoje dane</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 
 
 </resources>
