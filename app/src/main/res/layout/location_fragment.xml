@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/car2"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingTop="10dp"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
     android:id="@+id/location"
@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_marginRight="5dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="10dp"
                 android:text="START"
                 android:textColor="@android:color/white"
                 android:theme="@style/PrimaryButton" />
@@ -44,7 +44,10 @@
                 />
 
         </LinearLayout>
-        <LinearLayout
+
+   
+
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

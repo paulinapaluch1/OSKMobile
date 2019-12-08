@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.login.Test"
     >
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"

@@ -14,6 +14,23 @@
         </item>
 
     </style>
+    <style name="ButtonBlue" parent="Theme.AppCompat">
+        <item name="colorButtonNormal">#3bbdfa</item>
+        <item name="colorControlHighlight">#8ad4eb
+
+        </item>
+
+    </style>
+    <style name="LogoutButton" parent="Theme.AppCompat">
+        <item name="colorButtonNormal">@color/cardview_dark_background</item>
+        <item name="colorControlHighlight">#bcbcbc
+
+        </item>
+
+    </style>
+
+
+
 
     <style name="RedButton" parent="Theme.AppCompat">
         <item name="colorButtonNormal">@color/red</item>
@@ -30,5 +47,12 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
+    <style name="IconButton" parent="Widget.MaterialComponents.Button.OutlinedButton.Icon">
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconGravity">textStart</item>
+    </style>
 </resources>
