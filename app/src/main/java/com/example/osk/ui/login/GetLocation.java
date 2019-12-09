@@ -1,15 +1,12 @@
 package com.example.osk.ui.login;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -23,10 +20,11 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.osk.R;
-import com.example.osk.model.LocationToSend;
 import com.example.osk.remote.ApiUtils;
 import com.example.osk.remote.UserService;
 import com.example.osk.sqlite.DBManager;
+import com.example.osk.ui.login.ui.DrivingFragment;
+import com.example.osk.ui.login.ui.ProfileFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,9 +36,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 public class GetLocation extends FragmentActivity implements OnMapReadyCallback {
 
@@ -67,8 +62,8 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
         t = (TextView) findViewById(R.id.textView);
         //final Button buttonStart = (Button) findViewById(R.id.buttonStart);
         //buttonStop = (Button) findViewById(R.id.buttonStop);
-        //  final Button buttonSendData = findViewById(R.id.send);
-        // instructor = (EditText) findViewById(R.id.instructor);
+        // final Button buttonSendData = findViewById(R.id.send);
+        //instructor = (EditText) findViewById(R.id.instructor);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         //final Button logoutButton = findViewById(R.id.logout);
         dbManager = new DBManager(this);
@@ -78,31 +73,6 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
        // getLastLocation();
 
 
-        listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                t.append("\n " + location.getLongitude() + " " + location.getLatitude());
-                Date date = new Date();
-                dbManager.insert(String.valueOf(location.getLongitude()),
-                        String.valueOf(location.getLatitude()), date.toString(), 0);
-
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
-            }
-        };
 
         configure_button();
 
@@ -112,26 +82,7 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
             currentLoggedInstructorId = (Integer) extras.get("id");
         }
 /*
-        buttonStart.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Cursor c = dbManager.getDatabase().rawQuery("select * from gpspoints ", null);
-                if (c.getCount() == 0) {
-                    Toast.makeText(getApplicationContext(), "Brak danych", Toast.LENGTH_LONG).show();
-                    return true;
-                }
-                StringBuilder buffer = new StringBuilder();
-                while (c.moveToNext()) {
-                    buffer.append("id:" + c.getString(0) + " \n");
-                    buffer.append("location 1: " + c.getString(1) + " \n");
-                    buffer.append("location 2: " + c.getString(2) + " \n");
-                    buffer.append("time: " + c.getString(3) + " \n");
-                    buffer.append("sent: " + c.getString(4) + " \n");
-                }
-                Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
+
 */
       /*  buttonSendData.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,8 +119,8 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
         // LocationFragment fragment = (LocationFragment) getSupportFragmentManager().findFragmentById(R.id.location);
 
         adapter.addFrag(new Test(), "Mapa");
-        adapter.addFrag(new Test(), "Grafik");
-        adapter.addFrag(new LocationFragment(), "Profil");
+        adapter.addFrag(new DrivingFragment(), "Grafik");
+        adapter.addFrag(new ProfileFragment(), "Profil");
 
         viewPager.setAdapter(adapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -219,25 +170,6 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
     }
 
 
-    private ArrayList getGpsPointsToSend() {
-        String selectQuery = " select * from gpspoints where sent = 0";
-        Cursor cursor = dbManager.getReadableDatabase().rawQuery(selectQuery, null, null);
-        ArrayList pointsToSend = new ArrayList();
-        if (cursor.moveToFirst()) {
-            do {
-                LocationToSend location = new LocationToSend();
-                location.setNs(cursor.getString(cursor.getColumnIndex("ns")));
-                location.setNw(cursor.getString(cursor.getColumnIndex("nw")));
-                location.setTime(cursor.getString(cursor.getColumnIndex("time")));
-                location.setSent(cursor.getInt(cursor.getColumnIndex("sent")));
-                pointsToSend.add(location);
-
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        dbManager.getDatabase().close();
-        return pointsToSend;
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

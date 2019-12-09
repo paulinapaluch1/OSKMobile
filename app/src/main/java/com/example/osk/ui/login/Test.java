@@ -1,18 +1,32 @@
 package com.example.osk.ui.login;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.osk.R;
+import com.example.osk.model.LocationToSend;
+import com.example.osk.model.Message;
+import com.example.osk.remote.ApiUtils;
+import com.example.osk.remote.UserService;
+import com.example.osk.sqlite.DBManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,6 +38,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
+import java.util.Date;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.content.Context.LOCATION_SERVICE;
+
 public class Test extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -31,22 +54,114 @@ public class Test extends Fragment implements OnMapReadyCallback {
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int Request_Code = 101;
     Location locationn;
-
+    private TextView t;
+    private LocationManager locationManager;
+    private LocationListener listener;
+    private EditText instructor;
+    private DBManager dbManager;
+    private UserService userService;
+    private Integer currentLoggedInstructorId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.location_fragment, container, false);
 
-        /*
-         * Configure Mapview and sync to google map.
-         */
         mMapView = rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
         mMapView.onResume(); // needed to get the map to display immediately
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        //final Button logoutButton = findViewById(R.id.logout);
+        dbManager = new DBManager(getActivity());
+        dbManager.open();
+        userService = ApiUtils.getUserService();
+
+        Button buttonStart = rootView.findViewById(R.id.buttonStart);
+        Button buttonStop = rootView.findViewById(R.id.buttonStop);
+
+        buttonStart.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Cursor c = dbManager.getDatabase().rawQuery("select * from gpspoints ", null);
+                if (c.getCount() == 0) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Brak danych", Toast.LENGTH_LONG).show();
+                    return true;
+                }
+                StringBuilder buffer = new StringBuilder();
+                while (c.moveToNext()) {
+                    buffer.append("id:" + c.getString(0) + " \n");
+                    buffer.append("location 1: " + c.getString(1) + " \n");
+                    buffer.append("location 2: " + c.getString(2) + " \n");
+                    buffer.append("time: " + c.getString(3) + " \n");
+                    buffer.append("sent: " + c.getString(4) + " \n");
+                }
+                Toast.makeText(getActivity().getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
+
+
+
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                t.append("\n " + location.getLongitude() + " " + location.getLatitude());
+                Date date = new Date();
+                dbManager.insert(String.valueOf(location.getLongitude()),
+                        String.valueOf(location.getLatitude()), date.toString(), 0);
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(i);
+            }
+        };
+
+
+
+
+        buttonStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList pointsToSend = getGpsPointsToSend();
+
+                Call<Message> call = userService.sendCoordinates(pointsToSend, 1);//currentLoggedInstructorId);
+                call.enqueue(new Callback<Message>() {
+                    @Override
+                    public void onResponse(Call<Message> call, Response<Message> response) {
+                        if (response.isSuccessful()) {
+                            Message resObj = response.body();
+                            if (resObj.getMessage().equals("true")) {
+                                Toast.makeText(getActivity().getApplicationContext(), "Przesłano dane ", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(getActivity(), "Nie zapisano", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), "Wystąpił błąd. Spróbuj ponownie", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Message> call, Throwable t) {
+                        Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
 
         //your code
         return rootView;
@@ -94,6 +209,25 @@ public class Test extends Fragment implements OnMapReadyCallback {
     }
 
 
+    private ArrayList getGpsPointsToSend() {
+        String selectQuery = " select * from gpspoints where sent = 0";
+        Cursor cursor = dbManager.getReadableDatabase().rawQuery(selectQuery, null, null);
+        ArrayList pointsToSend = new ArrayList();
+        if (cursor.moveToFirst()) {
+            do {
+                LocationToSend location = new LocationToSend();
+                location.setNs(cursor.getString(cursor.getColumnIndex("ns")));
+                location.setNw(cursor.getString(cursor.getColumnIndex("nw")));
+                location.setTime(cursor.getString(cursor.getColumnIndex("time")));
+                location.setSent(cursor.getInt(cursor.getColumnIndex("sent")));
+                pointsToSend.add(location);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        dbManager.getDatabase().close();
+        return pointsToSend;
+    }
 
 
 }

@@ -6,5 +6,8 @@
     <color name="success_dark">#007E33</color>
     <color name="white">#ffffff</color>
     <color name="red">#cc0000</color>
+    <color name="graylight">#fafafa</color>
+    <color name="startblue">#09c6df</color>
+    <color name="endblue">#0bcce6</color>
 
 </resources>
