@@ -18,10 +18,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.osk.R;
+import com.example.osk.model.Instructor;
 import com.example.osk.model.LocationToSend;
 import com.example.osk.model.Message;
 import com.example.osk.remote.ApiUtils;
@@ -61,25 +63,80 @@ public class Test extends Fragment implements OnMapReadyCallback {
     private DBManager dbManager;
     private UserService userService;
     private Integer currentLoggedInstructorId;
+    private Button buttonSendData;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.location_fragment, container, false);
-
+        buttonSendData = rootView.findViewById(R.id.send);
         mMapView = rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
-        mMapView.onResume(); // needed to get the map to display immediately
+        mMapView.onResume();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
         locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-        //final Button logoutButton = findViewById(R.id.logout);
-        dbManager = new DBManager(getActivity());
-        dbManager.open();
-        userService = ApiUtils.getUserService();
 
+        userService = ApiUtils.getUserService();
+        getLastLocation();
         Button buttonStart = rootView.findViewById(R.id.buttonStart);
         Button buttonStop = rootView.findViewById(R.id.buttonStop);
+        dbManager = new DBManager(getActivity().getBaseContext());
+        dbManager.open();
+
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Date date = new Date();
+                dbManager.insert(String.valueOf(location.getLongitude()),
+                        String.valueOf(location.getLatitude()), date.toString(), 0);
+                LatLng latLng = new LatLng(locationn.getLatitude(), locationn.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("osk");
+               if(mMap!=null) {
+                   mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                   mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
+                   mMap.addMarker(markerOptions);
+               }
+
+
+
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+
+            @Override
+            public void onProviderDisabled(String s) {
+                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(i);
+            }
+        };
+
+
+
+        buttonStart.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View view) {
+                if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED
+                        && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                locationManager
+                        .requestLocationUpdates("gps", 5000,
+                                0, listener);
+            }
+        });
 
         buttonStart.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -104,31 +161,7 @@ public class Test extends Fragment implements OnMapReadyCallback {
 
 
 
-        listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                t.append("\n " + location.getLongitude() + " " + location.getLatitude());
-                Date date = new Date();
-                dbManager.insert(String.valueOf(location.getLongitude()),
-                        String.valueOf(location.getLatitude()), date.toString(), 0);
 
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
-            }
-        };
 
 
 
@@ -163,7 +196,39 @@ public class Test extends Fragment implements OnMapReadyCallback {
         });
 
 
-        //your code
+        buttonSendData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList pointsToSend = getGpsPointsToSend();
+
+                Call<Message> call = userService.sendCoordinates(pointsToSend, 1);//currentLoggedInstructorId);
+                call.enqueue(new Callback<Message>() {
+                    @Override
+                    public void onResponse(Call<Message> call, Response<Message> response) {
+                        if (response.isSuccessful()) {
+                            Message resObj = response.body();
+                            if (resObj.getMessage().equals("true")) {
+                                Toast.makeText(getActivity().getApplicationContext(), "Przesłano dane ", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(getActivity(), "Nie zapisano", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), "Wystąpił błąd. Spróbuj ponownie", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Message> call, Throwable t) {
+                        Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+
+
+
+
         return rootView;
     }
 
@@ -184,9 +249,9 @@ public class Test extends Fragment implements OnMapReadyCallback {
                 if (location != null) {
                     locationn = location;
                     LatLng latLng = new LatLng(locationn.getLatitude(), locationn.getLongitude());
-                    MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("here");
+                    MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("osk");
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
+                   mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
                     mMap.addMarker(markerOptions);
                 }
             }
@@ -200,12 +265,15 @@ public class Test extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.mMap = googleMap;
+if(locationn!=null) {
+    //LatLng latLng = new LatLng(51.237130, 22.548621);
+    LatLng latLng = new LatLng(locationn.getLatitude(), locationn.getLongitude());
 
-        LatLng latLng = new LatLng(51.237130, 22.548621);
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("OSK");
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
-        mMap.addMarker(markerOptions);
+    MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("OSK");
+    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
+    mMap.addMarker(markerOptions);
+}
     }
 
 
@@ -228,6 +296,9 @@ public class Test extends Fragment implements OnMapReadyCallback {
         dbManager.getDatabase().close();
         return pointsToSend;
     }
+
+
+
 
 
 }
