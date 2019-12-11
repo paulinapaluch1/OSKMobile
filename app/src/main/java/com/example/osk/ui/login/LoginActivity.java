@@ -135,6 +135,10 @@ public class LoginActivity extends AppCompatActivity {
                                 Intent intent = new Intent(LoginActivity.this, GetLocation.class);
                                 intent.putExtra("instructor", resObj.getName()+" "+resObj.getSurname());
                                 intent.putExtra("id", resObj.getId());
+                                intent.putExtra("average", resObj.getMarkAverage());
+                                intent.putExtra("login", resObj.getLogin());
+                                intent.putExtra("phone", resObj.getPhoneNumber());
+                                intent.putExtra("email", resObj.getEmail());
                                 String welcome = getString(R.string.welcome) +resObj.getName()+"!";
                                 Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
                                 startActivity(intent);
@@ -144,7 +148,6 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this,"Login lub hasło jest niepoprawne",Toast.LENGTH_SHORT).show();
                             }}else{
                             Toast.makeText(LoginActivity.this,"Wystąpił błąd. Spróbuj ponownie",Toast.LENGTH_SHORT).show();
-
                         }
                     }
 
@@ -158,7 +161,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();

@@ -13,7 +13,6 @@
     tools:ignore="MissingDefaultResource"
     tools:context=".ui.login.Test"
     >
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
@@ -45,20 +44,34 @@
 
         </LinearLayout>
 
-   
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="bottom">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="413dp"
+
+            />
+
+    </LinearLayout>
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="bottom">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/mapView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+        <Button
+            android:id="@+id/send"
+            android:layout_width="163dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="PRZEŚLIJ DANE"
+            android:textColor="@android:color/white"
+            android:theme="@style/PrimaryButton" />
 
-                />
 
-        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

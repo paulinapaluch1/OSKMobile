@@ -8,7 +8,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -45,14 +44,11 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
     private TextView t;
     private LocationManager locationManager;
     private LocationListener listener;
-    private EditText instructor;
     private DBManager dbManager;
     private UserService userService;
     private Integer currentLoggedInstructorId;
-
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int Request_Code = 101;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,16 +59,13 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
         //final Button buttonStart = (Button) findViewById(R.id.buttonStart);
         //buttonStop = (Button) findViewById(R.id.buttonStop);
         // final Button buttonSendData = findViewById(R.id.send);
-        //instructor = (EditText) findViewById(R.id.instructor);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         //final Button logoutButton = findViewById(R.id.logout);
         dbManager = new DBManager(this);
         dbManager.open();
         userService = ApiUtils.getUserService();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-       // getLastLocation();
-
-
+        // getLastLocation();
 
         configure_button();
 
@@ -81,42 +74,14 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
             // instructor.setText(instructor.getText() + " " + extras.get("instructor"));
             currentLoggedInstructorId = (Integer) extras.get("id");
         }
-/*
+        /*
 
-*/
-      /*  buttonSendData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ArrayList pointsToSend = getGpsPointsToSend();
-
-                Call<Message> call = userService.sendCoordinates(pointsToSend, 1);//currentLoggedInstructorId);
-                call.enqueue(new Callback<Message>() {
-                    @Override
-                    public void onResponse(Call<Message> call, Response<Message> response) {
-                        if (response.isSuccessful()) {
-                            Message resObj = response.body();
-                            if (resObj.getMessage().equals("true")) {
-                                Toast.makeText(getApplicationContext(), "Przesłano dane ", Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(GetLocation.this, "Nie zapisano", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(GetLocation.this, "Wystąpił błąd. Spróbuj ponownie", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Message> call, Throwable t) {
-                        Toast.makeText(GetLocation.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        }); */
+         */
+      /* */
         setContentView(R.layout.activity_start_stop);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         final ViewPagerAdapter adapter = new ViewPagerAdapter(fragmentManager);
-        // LocationFragment fragment = (LocationFragment) getSupportFragmentManager().findFragmentById(R.id.location);
 
         adapter.addFrag(new Test(), "Mapa");
         adapter.addFrag(new DrivingFragment(), "Grafik");
@@ -139,9 +104,7 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
         tabThree.setText("Profil");
         tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.profile, 0, 0);
         tabLayout.getTabAt(2).setCustomView(tabThree);
-
     }
-
     private void getLastLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -157,7 +120,7 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
             public void onSuccess(Location location) {
                 if (location != null) {
                     locationn = location;
-                  final  SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
+                    final  SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
                     supportMapFragment.getMapAsync(GetLocation.this);
 
 
@@ -197,7 +160,7 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
         }
     }
 
-    private void configure_button() {
+    public void configure_button() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
