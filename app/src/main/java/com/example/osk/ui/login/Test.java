@@ -97,10 +97,6 @@ public class Test extends Fragment implements OnMapReadyCallback {
                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
                    mMap.addMarker(markerOptions);
                }
-
-
-
-
             }
 
             @Override
@@ -111,7 +107,6 @@ public class Test extends Fragment implements OnMapReadyCallback {
             public void onProviderEnabled(String s) {
 
             }
-
 
             @Override
             public void onProviderDisabled(String s) {
@@ -158,13 +153,6 @@ public class Test extends Fragment implements OnMapReadyCallback {
                 return true;
             }
         });
-
-
-
-
-
-
-
 
         buttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,10 +213,6 @@ public class Test extends Fragment implements OnMapReadyCallback {
             }
         });
 
-
-
-
-
         return rootView;
     }
 
@@ -251,7 +235,7 @@ public class Test extends Fragment implements OnMapReadyCallback {
                     LatLng latLng = new LatLng(locationn.getLatitude(), locationn.getLongitude());
                     MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("osk");
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                   mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
                     mMap.addMarker(markerOptions);
                 }
             }
@@ -260,15 +244,11 @@ public class Test extends Fragment implements OnMapReadyCallback {
 
     }
 
-
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.mMap = googleMap;
-if(locationn!=null) {
-    //LatLng latLng = new LatLng(51.237130, 22.548621);
+    if(locationn!=null) {
     LatLng latLng = new LatLng(locationn.getLatitude(), locationn.getLongitude());
-
     MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("OSK");
     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
