@@ -26,27 +26,16 @@ import com.example.osk.ui.login.ui.DrivingFragment;
 import com.example.osk.ui.login.ui.ProfileFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 
-public class GetLocation extends FragmentActivity implements OnMapReadyCallback {
+public class GetLocation extends FragmentActivity {
 
-    //private Button buttonStop;
-    // private Button buttonSendData;
+
     Location locationn;
     private TextView t;
     private LocationManager locationManager;
-    private LocationListener listener;
     private DBManager dbManager;
     private UserService userService;
-    private Integer currentLoggedInstructorId;
     FusedLocationProviderClient fusedLocationProviderClient;
     private static final int Request_Code = 101;
 
@@ -56,34 +45,20 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         t = (TextView) findViewById(R.id.textView);
-        //final Button buttonStart = (Button) findViewById(R.id.buttonStart);
-        //buttonStop = (Button) findViewById(R.id.buttonStop);
-        // final Button buttonSendData = findViewById(R.id.send);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         //final Button logoutButton = findViewById(R.id.logout);
         dbManager = new DBManager(this);
         dbManager.open();
         userService = ApiUtils.getUserService();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        // getLastLocation();
 
-        configure_button();
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            // instructor.setText(instructor.getText() + " " + extras.get("instructor"));
-            currentLoggedInstructorId = (Integer) extras.get("id");
-        }
-        /*
-
-         */
-      /* */
         setContentView(R.layout.activity_start_stop);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         final ViewPagerAdapter adapter = new ViewPagerAdapter(fragmentManager);
 
-        adapter.addFrag(new Test(), "Mapa");
+        adapter.addFrag(new LocationFr(), "Mapa");
         adapter.addFrag(new DrivingFragment(), "Grafik");
         adapter.addFrag(new ProfileFragment(), "Profil");
 
@@ -104,70 +79,12 @@ public class GetLocation extends FragmentActivity implements OnMapReadyCallback 
         tabThree.setText("Profil");
         tabThree.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.profile, 0, 0);
         tabLayout.getTabAt(2).setCustomView(tabThree);
-    }
-    private void getLastLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
-                        , 10);
-            }
-            return;
-        }
 
-        Task<Location> task = fusedLocationProviderClient.getLastLocation();
-        task.addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    locationn = location;
-                    final  SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
-                    supportMapFragment.getMapAsync(GetLocation.this);
-
-
-
-                }
-            }
-        });
-
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+        tabLayout.bringToFront();
 
     }
 
 
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        LatLng latLng = new LatLng(locationn.getLatitude(), locationn.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("here");
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6));
-        googleMap.addMarker(markerOptions);
-
-    }
-
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 10:
-                configure_button();
-                break;
-            case Request_Code:
-                if(grantResults.length>0 && grantResults[0] ==PackageManager.PERMISSION_GRANTED){
-                    getLastLocation();
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void configure_button() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
-                        , 10);
-            }
-            return;
-        }
-    }
 }
 

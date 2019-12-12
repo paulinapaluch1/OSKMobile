@@ -49,7 +49,7 @@ import retrofit2.Response;
 
 import static android.content.Context.LOCATION_SERVICE;
 
-public class Test extends Fragment implements OnMapReadyCallback {
+public class LocationFr extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private MapView mMapView;
@@ -243,7 +243,6 @@ public class Test extends Fragment implements OnMapReadyCallback {
 
 
     }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.mMap = googleMap;
