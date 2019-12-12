@@ -98,15 +98,6 @@ public class DrivingFragment extends Fragment {
             public void onResponse(Call<ArrayList<TimetableJson>> call, Response<ArrayList<TimetableJson>> response) {
                 if (response.isSuccessful()) {
                     resObj = response.body();
-                  // int size= resObj.size();
-                   // name = new String[size];
-                   // hours= new String[size];
-                   //  types = new String[size];
-                 //   for(int i =0;i<size;i++){
-                      // name[i] = resObj.get(i).getStudentNameAndSurname();
-                       // hours[i] = resObj.get(i).getHours();
-                       // types[i] = resObj.get(i).getType();
-                  //  }
                         Toast.makeText(getActivity(),"Wystąpił błąd.",Toast.LENGTH_SHORT).show();
                     }else{
                     Toast.makeText(getActivity(),"Wystąpił błąd. Spróbuj ponownie",Toast.LENGTH_SHORT).show();
