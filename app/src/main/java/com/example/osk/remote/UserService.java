@@ -26,7 +26,6 @@ public interface UserService {
                                   @Path("instructor") Integer currentLoggedInstructorId);
     @GET("timetable/{id}")
     Call<ArrayList<TimetableJson>> getTodayTimetable(@Path("id") Integer instructorId);
-
 }
 
 
