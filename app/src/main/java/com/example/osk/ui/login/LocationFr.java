@@ -115,8 +115,6 @@ public class LocationFr extends Fragment implements OnMapReadyCallback {
             }
         };
 
-
-
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
