@@ -121,6 +121,8 @@ public class LocationFr extends Fragment implements OnMapReadyCallback {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
+                Toast.makeText(getActivity(), "Rozpoczęto zapis współrzędnych", Toast.LENGTH_SHORT).show();
+
                 if (getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED
                         && getActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -157,29 +159,8 @@ public class LocationFr extends Fragment implements OnMapReadyCallback {
         buttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList pointsToSend = getGpsPointsToSend();
-
-                Call<Message> call = userService.sendCoordinates(pointsToSend, 1);//currentLoggedInstructorId);
-                call.enqueue(new Callback<Message>() {
-                    @Override
-                    public void onResponse(Call<Message> call, Response<Message> response) {
-                        if (response.isSuccessful()) {
-                            Message resObj = response.body();
-                            if (resObj.getMessage().equals("true")) {
-                                Toast.makeText(getActivity().getApplicationContext(), "Przesłano dane ", Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(getActivity(), "Nie zapisano", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(getActivity(), "Wystąpił błąd. Spróbuj ponownie", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Message> call, Throwable t) {
-                        Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Toast.makeText(getActivity(), "Zatrzymano zapis współrzędnych", Toast.LENGTH_SHORT).show();
+                dbManager.close();
             }
         });
 
@@ -243,6 +224,7 @@ public class LocationFr extends Fragment implements OnMapReadyCallback {
 
 
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.mMap = googleMap;
