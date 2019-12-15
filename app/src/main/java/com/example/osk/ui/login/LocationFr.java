@@ -14,8 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -23,7 +21,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.osk.R;
-import com.example.osk.model.Instructor;
 import com.example.osk.model.LocationToSend;
 import com.example.osk.model.Message;
 import com.example.osk.remote.ApiUtils;
@@ -54,12 +51,9 @@ public class LocationFr extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private MapView mMapView;
     FusedLocationProviderClient fusedLocationProviderClient;
-    private static final int Request_Code = 101;
     Location locationn;
-    private TextView t;
     private LocationManager locationManager;
     private LocationListener listener;
-    private EditText instructor;
     private DBManager dbManager;
     private UserService userService;
     private Integer currentLoggedInstructorId;
@@ -81,6 +75,12 @@ public class LocationFr extends Fragment implements OnMapReadyCallback {
         getLastLocation();
         Button buttonStart = rootView.findViewById(R.id.buttonStart);
         Button buttonStop = rootView.findViewById(R.id.buttonStop);
+
+        Bundle extras = getActivity().getIntent().getExtras();
+        if (extras != null) {
+            currentLoggedInstructorId = (Integer)extras.get("id");
+        }
+
         dbManager = new DBManager(getActivity().getBaseContext());
         dbManager.open();
 
@@ -114,8 +114,6 @@ public class LocationFr extends Fragment implements OnMapReadyCallback {
                 startActivity(i);
             }
         };
-
-
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
@@ -169,8 +167,7 @@ public class LocationFr extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
                 ArrayList pointsToSend = getGpsPointsToSend();
-
-                Call<Message> call = userService.sendCoordinates(pointsToSend, 1);//currentLoggedInstructorId);
+                Call<Message> call = userService.sendCoordinates(pointsToSend, currentLoggedInstructorId);
                 call.enqueue(new Callback<Message>() {
                     @Override
                     public void onResponse(Call<Message> call, Response<Message> response) {

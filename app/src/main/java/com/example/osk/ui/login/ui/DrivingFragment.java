@@ -98,6 +98,7 @@ public class DrivingFragment extends Fragment {
             public void onResponse(Call<ArrayList<TimetableJson>> call, Response<ArrayList<TimetableJson>> response) {
                 if (response.isSuccessful()) {
                     resObj = response.body();
+
                         Toast.makeText(getActivity(),"Wystąpił błąd.",Toast.LENGTH_SHORT).show();
                     }else{
                     Toast.makeText(getActivity(),"Wystąpił błąd. Spróbuj ponownie",Toast.LENGTH_SHORT).show();

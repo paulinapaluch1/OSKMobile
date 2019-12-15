@@ -4,10 +4,8 @@ import com.example.osk.model.Instructor;
 import com.example.osk.model.LocationToSend;
 import com.example.osk.model.Message;
 import com.example.osk.model.TimetableJson;
-import com.example.osk.sqlite.Timetable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
